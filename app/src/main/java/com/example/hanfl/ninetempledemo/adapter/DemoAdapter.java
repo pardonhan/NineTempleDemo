@@ -12,7 +12,6 @@ import com.example.hanfl.ninetempledemo.data.PrizeData;
 import com.example.hanfl.ninetempledemo.eventbus.MessageEvent;
 
 import org.greenrobot.eventbus.EventBus;
-import org.xutils.common.util.LogUtil;
 
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class DemoAdapter extends RecyclerView.Adapter<DemoViewHolder> {
 
     @Override
     public DemoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LogUtil.d("onCreateViewHolder");
+
         mContext = parent.getContext();
         View view = LayoutInflater.from(mContext).inflate(R.layout.activity_main_item, parent, false);
         return new DemoViewHolder(view);

@@ -13,15 +13,11 @@ import com.example.hanfl.ninetempledemo.eventbus.MessageEvent;
 import com.example.hanfl.ninetempledemo.utils.AppJsonFileReader;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xutils.common.Callback;
-import org.xutils.http.RequestParams;
-import org.xutils.x;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -51,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         xRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         demoAdapter = new DemoAdapter(this, prizeList);
         xRecyclerView.setAdapter(demoAdapter);
-        getData();
+
         getJsonData();
         EventBus.getDefault().register(this);
     }
@@ -120,50 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void getResultData() {
 
-    }
-
-    private void getData() {
-      /*  RequestParams params = new RequestParams("http://114.215.92.83/jfshop/index.php/api/User/getPrizeList");
-        x.http().post(params, new Callback.CommonCallback<JSONObject>() {
-            @Override
-            public void onSuccess(JSONObject result) {
-                try {
-                    if (10000 == result.getInt("errcode") && "操作成功".equals(result.getString("msg"))) {
-                        String data = result.getString("data");
-                        Gson gson = new Gson();
-                        List<PrizeData> list = gson.fromJson(data, new TypeToken<List<PrizeData>>() {
-                        }.getType());
-                        prizeList.clear();
-                        for (int i = 0; i < list.size(); i++) {
-                            if (i == 4) {
-                                PrizeData prizeData = new PrizeData();
-                                prizeData.id = UUID.randomUUID().toString();
-                                prizeList.add(prizeData);
-                            }
-                            prizeList.add(list.get(i));
-                        }
-                        demoAdapter.notifyDataSetChanged();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(Throwable ex, boolean isOnCallback) {
-
-            }
-
-            @Override
-            public void onCancelled(CancelledException cex) {
-
-            }
-
-            @Override
-            public void onFinished() {
-
-            }
-        });*/
     }
 
     private static class MainHandler extends Handler {
