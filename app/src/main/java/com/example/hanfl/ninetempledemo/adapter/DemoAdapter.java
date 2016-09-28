@@ -24,6 +24,7 @@ import java.util.List;
 public class DemoAdapter extends RecyclerView.Adapter<DemoViewHolder> {
     private Context mContext;
     private List<PrizeData> list;
+    private boolean isRun = false;
 
     public DemoAdapter(Context context, List<PrizeData> datas) {
         this.mContext = context;
@@ -39,17 +40,23 @@ public class DemoAdapter extends RecyclerView.Adapter<DemoViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(DemoViewHolder holder, int position) {
-        LogUtil.d("onBindViewHolder");
+    public void onBindViewHolder(final DemoViewHolder holder, int position) {
         if (position == 4) {
-            holder.textView.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_default_award));
-            holder.textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    LogUtil.d("------------");
-                    EventBus.getDefault().post(new MessageEvent("Hello ", "everyone!"));
-                }
-            });
+            if (!isRun) {
+                holder.textView.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_default_award));
+                holder.textView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EventBus.getDefault().post(new MessageEvent("Hello ", "everyone!"));
+                        holder.textView.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_await_award));
+                        isRun = true;
+                        holder.textView.setOnClickListener(null);
+                    }
+                });
+            } else {
+                holder.textView.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_await_award));
+                holder.textView.setText("");
+            }
         } else {
             if (list.get(position).img == null) {
                 holder.textView.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_default));

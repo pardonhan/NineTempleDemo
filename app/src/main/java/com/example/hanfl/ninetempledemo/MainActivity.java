@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import com.example.hanfl.ninetempledemo.adapter.DemoAdapter;
 import com.example.hanfl.ninetempledemo.data.PrizeData;
 import com.example.hanfl.ninetempledemo.eventbus.MessageEvent;
+import com.example.hanfl.ninetempledemo.utils.AppJsonFileReader;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
@@ -36,9 +37,11 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView xRecyclerView;
     DemoAdapter demoAdapter;
     List<PrizeData> prizeList = new ArrayList<>();
-    private boolean isRun = true;
+    private volatile boolean isRun = true;
     private int count = 0;
     private MainHandler mainHandler = new MainHandler(new WeakReference<>(this));
+    private int[] array = new int[]{0, 1, 2, 5, 8, 7, 6, 3};
+    private int result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +52,33 @@ public class MainActivity extends AppCompatActivity {
         demoAdapter = new DemoAdapter(this, prizeList);
         xRecyclerView.setAdapter(demoAdapter);
         getData();
+        getJsonData();
         EventBus.getDefault().register(this);
+    }
+
+    private void getJsonData() {
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                String jsonStr = AppJsonFileReader.getJson(getBaseContext(), "result.json");
+                try {
+                    JSONObject jsonObject = new JSONObject(jsonStr);
+                    String data = jsonObject.getString("data");
+                    Gson gson = new Gson();
+                    List<PrizeData> list = gson.fromJson(data, new TypeToken<List<PrizeData>>() {
+                    }.getType());
+                    Message msg = new Message();
+                    msg.what = 2;
+                    msg.obj = list;
+                    mainHandler.sendMessage(msg);
+                    //mainHandler.sendEmptyMessage(2);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }.start();
     }
 
     @Override
@@ -60,23 +89,26 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe
     public void onMessageEvent(MessageEvent event) {
+        getResultData();
         new Thread() {
             @Override
             public void run() {
                 super.run();
                 try {
-
                     while (isRun) {
-                        sleep(150);
-                        if (count % 9 == 4) count++;
-                        int m = count % 9;
-                        for (int i = 0; i < prizeList.size(); i++) {
-                            prizeList.get(m).img = null;
+                        sleep(200);
+                        int m = count % 8;
+                        if (m == 0) {
+                            prizeList.get(array[7]).img = null;
+                        } else {
+                            prizeList.get(array[m - 1]).img = null;
                         }
-                        prizeList.get(m).img = "1";
-                        //demoAdapter.notifyDataSetChanged();
+                        prizeList.get(array[m]).img = "1";
                         mainHandler.sendEmptyMessage(1);
                         count++;
+                        if (count == 100) {
+                            isRun = false;
+                        }
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -86,9 +118,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void getResultData() {
+
+    }
 
     private void getData() {
-        RequestParams params = new RequestParams("http://114.215.92.83/jfshop/index.php/api/User/getPrizeList");
+      /*  RequestParams params = new RequestParams("http://114.215.92.83/jfshop/index.php/api/User/getPrizeList");
         x.http().post(params, new Callback.CommonCallback<JSONObject>() {
             @Override
             public void onSuccess(JSONObject result) {
@@ -128,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFinished() {
 
             }
-        });
+        });*/
     }
 
     private static class MainHandler extends Handler {
@@ -145,8 +180,22 @@ public class MainActivity extends AppCompatActivity {
             if (activity == null) {
                 return;
             }
-            activity.demoAdapter.notifyDataSetChanged();
+            if (msg.what == 1) {
+
+                activity.demoAdapter.notifyDataSetChanged();
+            }
+            if (msg.what == 2) {
+                List<PrizeData> list = (List<PrizeData>) msg.obj;
+                activity.prizeList.clear();
+                for (int i = 0; i < list.size(); i++) {
+                    if (i == 4) {
+                        PrizeData prizeData = new PrizeData();
+                        prizeData.id = UUID.randomUUID().toString();
+                        activity.prizeList.add(prizeData);
+                    }
+                    activity.prizeList.add(list.get(i));
+                }
+            }
         }
     }
-
 }
