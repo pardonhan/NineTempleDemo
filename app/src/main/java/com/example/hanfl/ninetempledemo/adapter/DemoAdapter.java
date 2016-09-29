@@ -30,6 +30,10 @@ public class DemoAdapter extends RecyclerView.Adapter<DemoViewHolder> {
         this.list = datas;
     }
 
+    public void setDatas(List<PrizeData> mDatas) {
+        this.list = mDatas;
+    }
+
     @Override
     public DemoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -46,7 +50,7 @@ public class DemoAdapter extends RecyclerView.Adapter<DemoViewHolder> {
                 holder.textView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        EventBus.getDefault().post(new MessageEvent("Hello ", "everyone!"));
+                        EventBus.getDefault().post(new MessageEvent("Hello", "everyone!"));
                         holder.textView.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_await_award));
                         isRun = true;
                         holder.textView.setOnClickListener(null);
